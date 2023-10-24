@@ -1,0 +1,8 @@
+{
+    "greetings": ["Hi there! How can I help you?", "Hello! What can I assist you with today?"],
+    "recipe_prompt": "Sure! Please enter the type of recipe you're looking for (e.g., pasta, chicken).",
+    "no_recipe_found": "I couldn't find a recipe for that. Please try something else.",
+    "api_error": "Sorry, there was an issue fetching the recipe. Please try again later.",
+    "unknown_error": "I'm not sure what you mean. Could you please rephrase your request?",
+    "thanks": "You're welcome! Enjoy your meal."
+}

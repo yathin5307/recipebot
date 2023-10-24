@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+        <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+    <div id="chatbox">
+        <div id="chat"></div>
+        <input type="text" id="userInput" placeholder="Type your message and press Enter">
+        <button id="startBtn">Start Chat</button>
+    </div>
+
+    <script>
+        const chatbox = document.getElementById("chatbox");
+        const chat = document.getElementById("chat");
+        const userInput = document.getElementById("userInput");
+        const startBtn = document.getElementById("startBtn");
+        let responses = null;
+
+        // Load responses from JSON file
+        fetch("responses.json")
+            .then(response => response.json())
+            .then(data => {
+                responses = data;
+            });
+
+        // Event listener for the start chat button
+        startBtn.addEventListener("click", startChat);
+
+        function startChat() {
+            addBotResponse("Welcome to the Recipe Chatbot! You can get a recipe by searching for a recipe type (e.g., pasta, chicken, etc). Just type in your recipe type and press Enter.");
+        }
+
+        // Event listener for user input
+        userInput.addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        const userMessage = userInput.value.trim();
+        addUserMessage(userMessage);
+
+        if (userMessage.toLowerCase() === "recommend a recipe") {
+            addBotResponse(responses.recipe_prompt);
+        } else if (userMessage.toLowerCase().includes("thanks") || userMessage.toLowerCase().includes("thank you")) {
+            addBotResponse("You're welcome! If you have more questions or need another recipe, feel free to ask.");
+        } else if (isGreeting(userMessage)) {
+            addBotResponse("Hello, I am your personalized recipe recommender bot. Enter recipe type you want to get the recipe.");
+        } else {
+            fetchRecipe(userMessage);
+        }
+
+        userInput.value = "";
+    }
+});
+
+// Function to check if the user message is a greeting
+function isGreeting(message) {
+    const greetings = ["hi", "hello", "hey", "hi there"];
+    return greetings.includes(message.toLowerCase());
+}
+
+        // Function to add a message from the user
+        function addUserMessage(message) {
+            chat.innerHTML += `<p class="user-message">${message}</p>`;
+        }
+
+        // Function to add a response from the bot
+        function addBotResponse(message) {
+            chat.innerHTML += `<p class="bot-message">${message}</p>`;
+        }
+
+        // Function to fetch a recipe from the Spoonacular API
+        function fetchRecipe(recipeType) {
+            // Replace 'YOUR_API_KEY' with your actual Spoonacular API key
+            const apiKey = 'ff7cf182b7d84c68aa951561b461d326';
+            const apiUrl = `https://api.spoonacular.com/recipes/random?apiKey=${apiKey}&tags=${recipeType}&number=1`;
+
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.recipes && data.recipes.length > 0) {
+                        const recipe = data.recipes[0];
+                        const recipeLink = `<a href="${recipe.sourceUrl}" target="_blank">${recipe.title}</a>`;
+                        addBotResponse(`Here's a recipe for ${recipeLink}`);
+                    } else {
+                        addBotResponse(responses.no_recipe_found);
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                    addBotResponse(responses.api_error);
+                });
+        }
+    </script>
+</body>
+</html>
